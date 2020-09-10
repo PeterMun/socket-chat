@@ -10,7 +10,7 @@ io.on('connection', (client) => {
     client.on('entrarChat', (data, callback) => {
 
 
-        if (!data.nombre || data.sala) {
+        if (!data.nombre || !data.sala) {
             return callback({
                 error: true,
                 mensaje: 'el nombre/sala es necesario'
@@ -23,7 +23,7 @@ io.on('connection', (client) => {
 
 
         client.broadcast.to(data.sala).emit('listaPersonas', usuarios.getPersonasPorSala());
-
+        client.broadcast.to(data.sala).emit('crearMensaje', crearMensaje('Administrador', `${ data.nombre } se unio`));
 
 
         callback(personas)
@@ -31,7 +31,7 @@ io.on('connection', (client) => {
 
     });
 
-    client.on('crearMensaje', (data) => {
+    client.on('crearMensaje', (data, callback) => {
 
 
         let persona = usuarios.getPersona(client.id)
@@ -41,6 +41,7 @@ io.on('connection', (client) => {
 
         client.broadcast.to(data.sala).emit('crearMensaje', mensaje);
 
+        callback(mensaje);
 
     })
 
